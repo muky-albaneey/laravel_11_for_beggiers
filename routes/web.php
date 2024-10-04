@@ -1,68 +1,45 @@
 <?php
 
+use App\Http\Controllers\JobController;
+use App\Http\Controllers\SessionController;
+use App\Http\Controllers\UserController;
+use App\Mail\JobPosted;
 use App\Models\Job;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
+// Route::get('/test', function(){
+//     Mail::to('mukyalbani1@gmail.com')->send(
+//         new JobPosted()
+//     );
+//     return 'done';
+// });
 
-Route::get('/jobs', function(){
-    $jobs = Job::with('employer')->latest()->cursorPaginate(5);
-    return view('jobs.index',['jobs'=>$jobs]);
-});
+Route::get('/jobs',[JobController::class, 'index' ]);
+Route::get('/jobs/create',[JobController::class, 'create']);
+Route::get('/jobs/{job}',[JobController::class, 'show']);
 
-Route::get('/jobs/create', function(){
-    return view('jobs.create');
-});
 
-Route::get('/jobs/{job}', function(Job $job){
-    // $job =  Job::find($id);
+Route::post('/jobs',[JobController::class, 'store']);
 
-    return view('jobs.show',['job'=>$job]);
-});
+Route::get('/jobs/{job}/edit',[JobController::class, 'edit'])->middleware(['auth', 'can:edit,job']);
+Route::patch('/jobs/{job}', [JobController::class, 'update']);
 
-Route::get('/jobs/{job}/edit',function(Job $job){
-    return view('jobs.edit',['job'=>$job]);
-});
+Route::delete('/jobs/{job}', [JobController::class, 'destroy']);
 
-Route::patch('/jobs/{job}', function(Job $job){
+// Route::resource('/jobs', JobController::class)->except('jobs')->middleware(['auth']);
 
-    // validate
-    request()->validate(
-        [
-            'title'=> ['required', 'min:4'],
-            'salary'=>['required']
-        ]
-        );
-    //authorize
+Route::get('/users',[UserController::class,'create']);
+Route::post('/users',[UserController::class, 'store']);
 
-    //update
+Route::get('/login',[SessionController::class, 'create'])->name('login');
+Route::post('/login',[SessionController::class, 'store']);
+Route::post('/logout',[SessionController::class, 'destroy']);
 
-    // $job->title = request('title');
-    // $job->salary  = request('salary');
-    // $job->save();
 
-        $job->update([
-            'title'=>request('title'),
-            'salary'=>request('salary'),
 
-        ]);
-    return redirect('/jobs');
-});
 
-Route::post('/jobs', function(){
-    request()->validate([
-        'title'=>['required', 'min:3'],
-        'salary'=> ['required', ]
-    ]);
-
-    Job::create([
-        'title' => request('title'),
-        'salary'=>request('salary'),
-        'employer_id'=>1
-    ]);
-
-    return redirect('/jobs');
-});

@@ -5,6 +5,9 @@
         {{ $job->title }}
         {{ $job->salary }}
 
-        <x-link-tag href="/jobs/{{ $job->id }}/edit">Edit job</x-link-tag>
+        @can('edit', $job)
+          <x-link-tag href="/jobs/{{ $job->id }}/edit">Edit job</x-link-tag>
+        @endcan
+
     </section>
 </x-layout>

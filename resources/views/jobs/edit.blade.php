@@ -30,10 +30,18 @@
       </div>
     </div>
 
-    <div class="mt-6 flex items-center justify-end gap-x-6">
-      <button type="button" class="text-sm font-semibold leading-6 text-gray-900">Cancel</button>
+    <div class="mt-6 flex items-center justify-between gap-x-6">
+        <button  form="form_delete" class="text-lg text-red-500 font-bold">Delete</button>
+        {{-- <button form="delete_form">delete</button> --}}
+      <div>
+        <button type="button" class="text-sm font-semibold leading-6 text-gray-900">Cancel</button>
       <x-form-btn>Edit</x-form-btn>
+      </div>
     </div>
   </form>
 
+  <form action="/jobs/{{ $job->id }}" method="POST" class="hidden" id="form_delete">
+    @csrf
+    @method('DELETE')
+</form>
 </x-layout>
